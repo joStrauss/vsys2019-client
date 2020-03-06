@@ -36,10 +36,12 @@ open class Application {
 
                 if (gKey.isNotEmpty() && gValue.isNotEmpty()) {
                     send(kafkaProducer, gKey, gValue)
+                    gKey = ""
+                    gValue = ""
                     println("\n\n\nAdded genome!\n\n\n")
                 }
             }
-
+            kafkaProducer.flush()
             kafkaProducer.close()
         }
 
@@ -52,8 +54,8 @@ open class Application {
 
 
             return Properties().apply {
-                this["bootstrap.servers"] = "10.244.0.7:9092"
-                this["enable.auto.commit"] = "true"
+                this["bootstrap.servers"] = "192.168.64.15:9093"
+                this["enable.auto.commit"] = "false"
                 this["auto.commit.interval.ms"] = "1000"
                 this["auto.offset.reset"] = "earliest"
                 this["session.timeout.ms"] = "30000"
@@ -61,7 +63,8 @@ open class Application {
                 this["value.deserializer"] = "org.apache.kafka.common.serialization.StringDeserializer"
                 this["key.serializer"] = "org.apache.kafka.common.serialization.StringSerializer"
                 this["value.serializer"] = "org.apache.kafka.common.serialization.StringSerializer"
-                this["security.protocol"] = "SSL"
+                this["acks"] = "all"
+                this["enable.idempotence"] = "true"
             }
         }
 
